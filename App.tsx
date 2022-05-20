@@ -1,7 +1,14 @@
 import { setDate } from "date-fns";
 import { format } from "date-fns/esm";
-import React, { useState } from "react";
-import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  Button,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import {
   Calendar,
   DayProps,
@@ -17,7 +24,7 @@ export default function App() {
   const [markedDates, setMarkedDates] = useState<MarkedDateProps>(
     {} as MarkedDateProps
   );
-  const [dates, setDates] = useState<string[]>([]);
+  const [dates, setDates] = useState<any[]>([]);
 
   const handleChangeDate = (date: DayProps) => {
     let start = !lastSelectedDate.timestamp ? date : lastSelectedDate;
@@ -31,28 +38,28 @@ export default function App() {
     setLastSelectedDate(end);
     const interval = generateInterval(start, end);
     setMarkedDates(interval);
-    itemInArray();
   };
 
   const handleCloseCalendar = () => {
     setIsVisibleCalendar(false);
+    itemInArray();
   };
 
   const handleOpenCalendar = () => {
     setIsVisibleCalendar(true);
   };
 
-  const itemInArray = () => {
-    const arrayAuxiliar = [];
-    Object.keys(markedDates).forEach((item) => {
-      arrayAuxiliar.push(format(new Date(item), 'dd-MM-yyyy'));
+  const itemInArray = useCallback(() => {
+    const newArray = [];
+    Object.keys(markedDates).map((item) => {
+      newArray.push(format(new Date(item), 'dd/MM'));
     });
-    setDates(arrayAuxiliar);
-  };
+    setDates(newArray);
+  }, [markedDates]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>
+      <Text style={styles.text}>
         {dates[0]} e {dates[dates.length - 1]}
       </Text>
       <Calendar
@@ -71,5 +78,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#eee",
     justifyContent: "center",
+  },
+  text: {
+    textAlign: "center",
   },
 });
